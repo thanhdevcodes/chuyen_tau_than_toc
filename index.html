@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0d1b2e" />
+    <title>Chuyến tàu SINH TỬ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Oswald:wght@500;700&family=IBM+Plex+Mono:wght@500;700&display=swap"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="bar">
+        <div class="brand">Chuyến tàu <b>SINH TỬ</b></div>
+        <ol class="track" id="track" aria-label="Tiến độ"></ol>
+        <div class="clockbox" id="clockbox">
+          <div class="clock" id="clock" aria-live="off">12:00</div>
+          <div class="tools">
+            <button class="tool" id="hintBtn" type="button">
+              Gợi ý <kbd>H</kbd>
+            </button>
+            <button class="tool" id="soundBtn" type="button">
+              Âm thanh: bật
+            </button>
+            <button
+              class="tool"
+              id="menuBtn"
+              type="button"
+              aria-expanded="false"
+              aria-controls="menu"
+            >
+              Điều khiển
+            </button>
+          </div>
+          <div class="menu" id="menu" hidden>
+            <button type="button" id="mPause">Tạm dừng <kbd>P</kbd></button>
+            <button type="button" id="mPlus">Thêm 1 phút</button>
+            <button type="button" id="m1Difficulty">Đổi sang đề dễ</button>
+            <button type="button" id="mSkip">
+              Bỏ qua chặng này (−60 giây)
+            </button>
+            <button type="button" id="mFull">Toàn màn hình <kbd>F</kbd></button>
+            <button type="button" id="mReset">Chơi lại từ đầu</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="threat" aria-label="Đoàn tàu đang tiến về cầu đứt">
+        <div class="rail-bed">
+          <div class="threat-fill" id="threat"></div>
+          <div class="rail-lines"></div>
+        </div>
+        <div class="train" id="train" aria-hidden="true">
+          <svg
+            viewBox="0 0 180 68"
+            role="img"
+            aria-label="Đầu máy hơi nước và toa tàu"
+          >
+            <path
+              class="train-smoke"
+              d="M94 11c-9-6 2-9-4-14M107 12c-7-6 3-9-2-14"
+            />
+            <path class="train-car" d="M5 27h48v24H5z" />
+            <path class="train-car-roof" d="M2 25h54v5H2z" />
+            <path class="train-window" d="M11 33h12v10H11zm20 0h12v10H31z" />
+            <path class="train-detail" d="M7 48h48M5 52h126" />
+            <path class="train-body" d="M51 23h67V13h25l15 16h10v22H51z" />
+            <path class="train-boiler" d="M71 18h49v17H71z" />
+            <path class="train-cab" d="M51 17h23v26H51z" />
+            <path
+              class="train-window"
+              d="M57 22h11v13H57zM126 17h15l11 12h-26z"
+            />
+            <path
+              class="train-detail"
+              d="M51 43h128M81 38h17v5H81zm24 0h17v5h-17zm28 0h17v5h-17zM88 17V9h12v9"
+            />
+            <circle class="train-wheel" cx="20" cy="53" r="7" />
+            <circle class="train-wheel" cx="43" cy="53" r="7" />
+            <circle class="train-wheel" cx="75" cy="53" r="8" />
+            <circle class="train-wheel" cx="117" cy="53" r="8" />
+            <circle class="train-wheel" cx="157" cy="53" r="8" />
+            <path class="train-light" d="M174 32h6v9h-6z" />
+          </svg>
+        </div>
+        <div class="threat-label">
+          <span>Đoàn tàu đang lao xuống dốc</span><span>Cầu đứt</span>
+        </div>
+      </div>
+
+      <main class="stage">
+        <section class="screen intro" data-screen="intro">
+          <div class="intro-copy">
+            <div class="eyebrow">Mini game · Chương 4</div>
+            <h1>Chuyến tàu <span>SINH TỬ</span></h1>
+            <p class="story">
+              Hà Nội, tháng 11/1946. Chuyến tàu chở các đại biểu Quốc hội và bản
+              dự thảo Hiến pháp đầu tiên của nước Việt Nam Dân chủ Cộng hòa đang
+              lao xuống dốc: kẻ phá hoại đã khóa hệ thống phanh bằng 5 mật mã và
+              1 bức ảnh bị che. Phía trước là cầu đứt. Cả lớp là kíp lái, phải
+              mở hộp phanh khẩn cấp trước khi tàu tới nơi.
+            </p>
+          </div>
+          <div class="brief">
+            <div class="eyebrow">Nhiệm vụ của cả lớp</div>
+            <ol>
+              <li>
+                Cả lớp là một đội. Mọi người hô đáp án, người dẫn nhập vào máy.
+              </li>
+              <li>
+                Giải xong mỗi mật mã được một mảnh mã. Đoán ra từ khóa của bức
+                ảnh mới qua được toa tiếp theo. Gom đủ 5 mảnh để mở hộp phanh
+                khẩn cấp.
+              </li>
+              <li>
+                Xin gợi ý mất 30 giây. Trả lời sai thì đoàn tàu lao tới cầu đứt
+                nhanh hơn.
+              </li>
+            </ol>
+            <div class="seg" id="timeSeg">
+              <span>Thời gian</span>
+              <button type="button" data-min="10" aria-pressed="false">
+                10 phút
+              </button>
+              <button type="button" data-min="12" aria-pressed="true">
+                12 phút
+              </button>
+              <button type="button" data-min="15" aria-pressed="false">
+                15 phút
+              </button>
+            </div>
+            <button class="btn" id="startBtn" type="button">Lên tàu ▸</button>
+          </div>
+        </section>
+
+        <section class="screen" data-screen="play" hidden>
+          <div class="panel" data-stage="m1" hidden>
+            <div class="head">
+              <div>
+                <div class="eyebrow">Mật mã 1 / 5</div>
+                <h2 class="ptitle">Máy tính điều độ</h2>
+                <p class="task">
+                  Máy tính điều độ của ga bị treo. Chạy thử đoạn mã bên dưới
+                  bằng đầu, xem nó in ra con số nào. Con số đó là một năm: năm
+                  khai sinh của nhà nước dân chủ nhân dân đầu tiên ở Đông Nam Á.
+                </p>
+              </div>
+            </div>
+            <div class="m1">
+              <button
+                class="m1-code-frame"
+                id="m1ImageButton"
+                type="button"
+                aria-label="Phóng to ảnh mã C++"
+              >
+                <img
+                  id="m1CodeImage"
+                  src="code_chinh_cpp.png"
+                  alt="int f(int n) {
+    if (n &lt;= 1) return n;
+    return f(n - 1) + n;
+}
+int main() {
+    cout &lt;&lt; 1900 + f(9);
+}"
+                />
+              </button>
+              <div class="side">
+                <section class="m1-lookup">
+                  <h3>Bảng tra nhanh</h3>
+                  <p id="m1QuickRef">
+                    int: số nguyên · if: nếu · return: trả giá trị về · cout
+                    &lt;&lt;: in ra màn hình · hàm gọi lại chính nó gọi là đệ
+                    quy
+                  </p>
+                </section>
+                <form class="answer stack" id="m1Form" autocomplete="off">
+                  <input
+                    id="m1A"
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="Máy in ra con số…"
+                    aria-label="Máy in ra con số"
+                  />
+                  <button class="btn" type="submit">Gửi</button>
+                </form>
+                <div class="msg" id="m1Msg" aria-live="polite"></div>
+              </div>
+            </div>
+            <div class="hints" data-hints="m1"></div>
+          </div>
+
+          <div class="panel" data-stage="m2" hidden>
+            <div class="head">
+              <div>
+                <div class="eyebrow">Mật mã 2 / 5</div>
+                <h2 class="ptitle">Sổ hành trình bị xé</h2>
+                <p class="task">
+                  Sáu trang sổ hành trình bị xáo trộn. Bấm các sự kiện để xếp từ
+                  sớm nhất đến muộn nhất, bấm vào thẻ đã xếp để gỡ ra. Xếp đủ 6
+                  thẻ rồi nộp một lần.
+                </p>
+              </div>
+            </div>
+            <div class="rail" id="rail" aria-label="Thứ tự sự kiện"></div>
+            <div class="deck" id="deck" aria-label="Các thẻ sự kiện"></div>
+            <div class="row">
+              <button class="btn" id="m2Submit" type="button">Nộp thứ tự</button
+              ><button class="btn ghost" id="m2Clear" type="button">
+                Gỡ hết
+              </button>
+            </div>
+            <div class="msg" id="m2Msg" aria-live="polite"></div>
+            <div class="hints" data-hints="m2"></div>
+          </div>
+
+          <div class="panel" data-stage="p1" hidden></div>
+
+          <div class="panel" data-stage="cw" hidden>
+            <div class="head">
+              <div>
+                <div class="eyebrow">Mật mã 3 / 5</div>
+                <h2 class="ptitle">Ô chữ của nhân viên soát vé</h2>
+                <p class="task">
+                  Giải 6 hàng ngang. Bấm vào một câu hỏi để chọn hàng, rồi nhập
+                  đáp án. Cột tô vàng là một từ khóa: đoán trúng hàng dọc là qua
+                  luôn.
+                </p>
+              </div>
+            </div>
+            <div class="cwwrap">
+              <div class="cw-scroll"><div class="cw" id="cw"></div></div>
+              <div class="side">
+                <ol class="clues" id="clues"></ol>
+                <form class="answer" id="cwForm" autocomplete="off">
+                  <input
+                    id="cwInput"
+                    placeholder="Hàng 1…"
+                    aria-label="Đáp án hàng ngang"
+                  /><button class="btn" type="submit">Gửi</button>
+                </form>
+                <div class="msg" id="cwMsg" aria-live="polite"></div>
+              </div>
+            </div>
+            <div class="hints" data-hints="cw"></div>
+          </div>
+
+          <div class="panel" data-stage="m3" hidden>
+            <div class="head">
+              <div>
+                <div class="eyebrow">Mật mã 4 / 5</div>
+                <h2 class="ptitle">Bẻ ghi ngã ba</h2>
+                <p class="task">
+                  Đoàn tàu đi qua 4 ngã ba đường ray. Mỗi ngã có 3 nhánh, chỉ
+                  một nhánh dẫn tới cầu an toàn. Chọn đúng nhánh để bẻ ghi. Chọn
+                  sai, tàu lao vào đường cụt và mất thời gian.
+                </p>
+              </div>
+              <div class="junction-progress" id="junctionProgress">
+                Đã qua 0 / 4 ngã ba
+              </div>
+            </div>
+            <div class="junction-question" id="junctionQuestion"></div>
+            <div class="junction-map" id="junctionMap">
+              <svg
+                class="junction-svg"
+                id="junctionSvg"
+                viewBox="0 0 1000 420"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              ></svg>
+              <div class="junction-train" id="junctionTrain" aria-hidden="true">
+                <svg viewBox="0 0 120 54">
+                  <path d="M9 24h71V9h19l13 15h5v20H9z" />
+                  <path d="M86 14h11l8 10H86z" />
+                  <circle cx="28" cy="45" r="6" />
+                  <circle cx="78" cy="45" r="6" />
+                  <circle cx="103" cy="45" r="6" />
+                </svg>
+              </div>
+              <div class="junction-branches" id="junctionBranches"></div>
+            </div>
+            <div class="msg" id="m3Msg" aria-live="polite"></div>
+            <div class="hints" data-hints="m3"></div>
+          </div>
+
+          <div class="panel" data-stage="m4" hidden>
+            <div class="head">
+              <div>
+                <div class="eyebrow">Mật mã 5 / 5</div>
+                <h2 class="ptitle">Ổ khóa bốn vòng số</h2>
+                <p class="task">
+                  Mỗi vòng số là đáp án của một câu hỏi. Chỉnh đủ bốn vòng rồi
+                  bấm <b>Thử mở khóa</b>. Khóa không cho biết vòng nào sai.
+                </p>
+              </div>
+            </div>
+            <div class="m4">
+              <div class="lock" id="lock">
+                <div class="shackle"></div>
+                <div class="lockbody" id="dials"></div>
+              </div>
+              <div class="side">
+                <ol class="qs">
+                  <li>
+                    <b>I</b
+                    ><span
+                      >Cơ chế vận hành của hệ thống chính trị Việt Nam gồm mấy
+                      chủ thể?</span
+                    >
+                  </li>
+                  <li>
+                    <b>II</b
+                    ><span
+                      >Phương châm "Dân biết, dân bàn, dân làm, dân kiểm tra"
+                      gồm mấy vế?</span
+                    >
+                  </li>
+                  <li>
+                    <b>III</b
+                    ><span
+                      >Quyền lực nhà nước thống nhất, có phân công, phối hợp,
+                      kiểm soát giữa mấy quyền?</span
+                    >
+                  </li>
+                  <li>
+                    <b>IV</b
+                    ><span
+                      >Mục tiêu "dân giàu, nước mạnh, dân chủ, công bằng, văn
+                      minh" gồm mấy tiêu chí?</span
+                    >
+                  </li>
+                </ol>
+                <div class="row">
+                  <button class="btn" id="m4Try" type="button">
+                    Thử mở khóa
+                  </button>
+                </div>
+                <div class="msg" id="m4Msg" aria-live="polite"></div>
+              </div>
+            </div>
+            <div class="hints" data-hints="m4"></div>
+          </div>
+
+          <div class="panel" data-stage="safe" hidden>
+            <div class="head">
+              <div>
+                <div class="eyebrow">Chặng cuối</div>
+                <h2 class="ptitle">Mở hộp phanh khẩn cấp</h2>
+                <p class="task">
+                  Mã gồm 5 chữ số: tháng và năm diễn ra cuộc Tổng tuyển cử đầu
+                  tiên. Xếp 5 mảnh mã đã gom được cho đúng thứ tự.
+                </p>
+              </div>
+            </div>
+            <div class="safe">
+              <div class="brake-cabinet" id="brakeCabinet">
+                <div class="cabinet-top">HỆ THỐNG PHANH · KHẨN CẤP</div>
+                <div class="cabinet-window">KÉO CẦN GẠT XUỐNG</div>
+                <div class="lever-track">
+                  <div class="lever" aria-hidden="true"><span></span></div>
+                  <div class="lever-mark">GẠT</div>
+                </div>
+                <div class="cabinet-foot">PHANH TÀU · GA HÀ NỘI</div>
+              </div>
+              <div class="side">
+                <div class="keyhead">5 mảnh mã đã gom</div>
+                <div class="pieces" id="pieces"></div>
+                <div class="keyhead">Nhập mã khẩn cấp</div>
+                <div class="lcd" id="lcd" aria-label="Mã đã nhập">
+                  <span></span><span></span><span></span><span></span
+                  ><span></span>
+                </div>
+                <div class="pad" id="pad"></div>
+                <div class="msg" id="safeMsg" aria-live="polite"></div>
+              </div>
+            </div>
+            <div class="hints" data-hints="safe"></div>
+          </div>
+        </section>
+
+        <section class="screen end" data-screen="win" hidden>
+          <div>
+            <div class="eyebrow">Hộp phanh đã mở</div>
+            <h2>Phanh đã ăn,<br />tàu dừng an toàn!</h2>
+            <span class="title-badge" id="badge"></span>
+            <div class="stats">
+              <div class="stat">
+                <b id="sLeft">0:00</b><span>thời gian còn lại</span>
+              </div>
+              <div class="stat">
+                <b id="sHints">0</b><span>số lần gợi ý</span>
+              </div>
+              <div class="stat"><b id="sErr">0</b><span>số lần sai</span></div>
+            </div>
+            <div class="row">
+              <button class="btn ghost" type="button" data-act="reset">
+                Chơi lại
+              </button>
+            </div>
+          </div>
+          <article class="doc">
+            <div class="seal">ĐÃ DỪNG AN TOÀN</div>
+            <h3>Biên bản dừng tàu<small>Chuyến tàu Hà Nội · 1946</small></h3>
+            <dl>
+              <div>
+                <dt>Sự kiện</dt>
+                <dd>
+                  Quốc hội khóa I thông qua Hiến pháp đầu tiên của nước Việt Nam
+                  Dân chủ Cộng hòa (9/11/1946).
+                </dd>
+              </div>
+              <div>
+                <dt>Nguyên tắc</dt>
+                <dd>
+                  Quyền lực thuộc về Nhân dân; Hiến pháp và pháp luật có tính
+                  tối thượng.
+                </dd>
+              </div>
+              <div>
+                <dt>Cơ chế</dt>
+                <dd>Đảng lãnh đạo, Nhà nước quản lý, Nhân dân làm chủ.</dd>
+              </div>
+            </dl>
+          </article>
+        </section>
+
+        <section class="screen end lose" data-screen="lose" hidden>
+          <div>
+            <div class="eyebrow">Hết giờ</div>
+            <h2>Tàu lao xuống<br />cầu đứt!</h2>
+            <p class="task">
+              Chuyến tàu chưa kịp dừng. Kíp lái có thể xin thêm 1 phút để tiếp
+              tục.
+            </p>
+            <div class="row">
+              <button class="btn" type="button" id="moreBtn">Thêm 1 phút</button
+              ><button class="btn ghost" type="button" data-act="reset">
+                Chơi lại
+              </button>
+            </div>
+          </div>
+          <article class="doc">
+            <h3>Lời giải</h3>
+            <ol class="solutions">
+              <li>
+                Máy tính điều độ: <b>f(9) = 45, in ra 1900 + 45 = 1945.</b>
+              </li>
+              <li>
+                Sổ hành trình: <b>D – B – F – A – E – C</b> (2/9/1945 → 6/1/1946
+                → 9/11/1946 → 1986 → 2011 → 28/11/2013).
+              </li>
+              <li>Tấm ảnh: <b>TỔNG TUYỂN CỬ</b>.</li>
+              <li>
+                Ô chữ: ĐỘC LẬP · HÀNH PHÁP · NHÀ NƯỚC · CÔNG NHÂN · HIẾN PHÁP ·
+                QUYỀN → <b>DÂN CHỦ</b>.
+              </li>
+              <li>
+                Bẻ ghi: nhánh “Thống nhất, có phân công, phối hợp, kiểm soát” ·
+                “Mọi cơ quan, tổ chức, cá nhân” · “Nhân dân, cùng Mặt trận Tổ
+                quốc phản biện” · “Pháp chế, kỷ cương, kỷ luật”.
+              </li>
+              <li>
+                Ổ khóa: <b>3 – 4 – 3 – 5</b>. Mã phanh: <b>11946</b> (tháng
+                1/1946).
+              </li>
+            </ol>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <div class="overlay" id="reward" hidden>
+      <div class="reward">
+        <div class="eyebrow" id="rwTitle">Mật mã đã giải</div>
+        <div class="chip" id="rwDigit">6</div>
+        <img class="rwimg" id="rwPic" alt="" hidden />
+        <div class="kwbig" id="rwKw" hidden></div>
+        <p id="rwNote"></p>
+        <button class="btn" type="button" id="rwNext">Chặng tiếp theo ▸</button>
+      </div>
+    </div>
+    <div class="overlay" id="pauseOv" hidden>
+      <div class="reward">
+        <div class="paused-note">Tạm dừng</div>
+        <button class="btn" type="button" id="resumeBtn">Tiếp tục ▸</button>
+      </div>
+    </div>
+    <div
+      class="m1-zoom"
+      id="m1Zoom"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Ảnh mã C++ phóng to"
+      hidden
+    >
+      <button class="m1-zoom-close" id="m1ZoomClose" type="button">
+        Đóng ảnh · Esc
+      </button>
+      <img id="m1ZoomImage" alt="" />
+    </div>
+    <div class="overlay" id="boardingWarning" hidden>
+      <section
+        class="reward warning"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="warningTitle"
+        aria-describedby="warningText"
+      >
+        <div class="eyebrow">Cảnh báo trước khi khởi hành</div>
+        <h2 id="warningTitle">Kíp lái đã sẵn sàng?</h2>
+        <p id="warningText">
+          Khi lên tàu, bạn phải có kiến thức nền tảng vững chắc về môn học này
+          và giữ cho mình một cái đầu lạnh. Bạn vẫn muốn lên tàu chứ?
+        </p>
+        <div class="row warning-actions">
+          <button class="btn ghost" id="boardAgree" type="button">
+            Tôi dong tinh
+          </button>
+          <button class="btn" id="boardVeryAgree" type="button">
+            Tôi rất dong tinh <span>(+30 giây)</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
