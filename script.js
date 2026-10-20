@@ -11,6 +11,7 @@ const STAGES = [
   { id: 'cw', label: 'IV', digit: 9 },
   { id: 'm3', label: 'V', digit: 4 },
   { id: 'm4', label: 'VI', digit: 1 },
+  { id: 'circuit', label: 'MẠCH', digit: null },
   { id: 'safe', label: 'PHANH', digit: null }
 ];
 const CODE = '11946';
@@ -18,9 +19,10 @@ const HINTS = {
   m1: ['Hàm f(n) gọi lại chính nó với n - 1 rồi cộng thêm n. Thử tính f(2), f(3) trước.', 'f(9) = 9 + 8 + 7 + … + 1 = 45. Còn lại là cộng với 1900.'],
   m2: ['Hai sự kiện sớm nhất: một là khai sinh nước Việt Nam Dân chủ Cộng hòa, một là cuộc bầu Quốc hội đầu tiên.', 'Hai sự kiện muộn nhất đều thuộc thế kỷ XXI; muộn nhất là Hiến pháp hiện hành.'],
   p1: ['Đã lật chữ cái đầu của mỗi từ trong từ khóa.', 'Đã lật thêm một nửa số chữ cái.'],
-  cw: ['Cột tô vàng là tên của giá trị cốt lõi mà cả chương bàn tới: nhân dân là chủ thể của quyền lực.', 'Hàng 1 là bản tuyên ngôn năm 1945.'],
+  cw: ['Cột tô vàng là chủ thể nắm mọi quyền lực nhà nước.', 'Hàng 5 là bản tuyên ngôn năm 1945.'],
   m3: ['Đáp án đúng ở ngã ba 1 có hai từ: "thống nhất" và "kiểm soát".', 'Ở ngã ba 2, không ai đứng ngoài Hiến pháp và pháp luật.'],
   m4: ['Vòng I: Đảng, Nhà nước, Nhân dân. Vòng II: đếm các vế bắt đầu bằng chữ "dân". Vòng III: lập pháp, hành pháp, tư pháp.', 'Vòng IV: đếm các tiêu chí trong mục tiêu dân giàu, nước mạnh, dân chủ, công bằng, văn minh.'],
+  circuit: ['Mối nối đầu tiên: Nhân dân là chủ thể của quyền lực nhà nước.', 'Đảng Cộng sản Việt Nam lãnh đạo Nhà nước và xã hội.'],
   safe: ['Tháng viết bằng 1 chữ số, năm viết bằng 4 chữ số.', 'Mã bắt đầu bằng 1 và kết thúc bằng 6.']
 };
 const EASY_M1_HINTS = ['Mỗi vòng lặp cộng i vào nam, i chạy từ 1 đến 9.', '1 + 2 + … + 9 = 45.'];
@@ -47,15 +49,17 @@ const EVENTS = [
 ];
 const DECK_ORDER = [3, 1, 5, 0, 4, 2];
 const CW = [
-  ['DOCLAP', 'ĐỘCLẬP', 0, 'Ngày 2/9/1945, Hồ Chí Minh đọc Tuyên ngôn ___.'],
+  ['NHANUOC', 'NHÀNƯỚC', 0, 'Đảng lãnh đạo, ___ quản lý, Nhân dân làm chủ.'],
+  ['HIENPHAP', 'HIẾNPHÁP', 0, 'Quốc hội thông qua ___ hiện hành ngày 28/11/2013.'],
   ['HANHPHAP', 'HÀNHPHÁP', 1, 'Quyền lập pháp, ___, tư pháp.'],
-  ['NHANUOC', 'NHÀNƯỚC', 0, '___ pháp quyền XHCN Việt Nam là nhà nước của Nhân dân, do Nhân dân, vì Nhân dân.'],
-  ['CONGNHAN', 'CÔNGNHÂN', 0, 'Liên minh ___ – nông dân – trí thức.'],
-  ['HIENPHAP', 'HIẾNPHÁP', 0, 'Tính tối thượng của ___ và pháp luật.'],
-  ['QUYEN', 'QUYỀN', 1, 'Nhà nước tôn trọng và bảo đảm ___ con người.']
+  ['THONGNHAT', 'THỐNGNHẤT', 3, 'Quyền lực nhà nước là ___, có phân công, phối hợp, kiểm soát.'],
+  ['DOCLAP', 'ĐỘCLẬP', 0, 'Ngày 2/9/1945, Hồ Chí Minh đọc Tuyên ngôn ___.'],
+  ['DANG', 'ĐẢNG', 1, '___ Cộng sản Việt Nam lãnh đạo Nhà nước.'],
+  ['CONGNHAN', 'CÔNGNHÂN', 2, 'Liên minh ___ – nông dân – trí thức.']
 ];
-const CW_KEY = 'DANCHU';
-const KEYCOL = Math.max(...CW.map(row => row[2]));
+const CW_KEY = 'NHANDAN';
+const CW_KEY_DISPLAY = 'NHÂNDÂN';
+const KEYCOL = 3;
 const CWCOLS = Math.max(...CW.map(([, word, key]) => KEYCOL - key + [...word].length));
 const JUNCTIONS = [
   ['Quyền lực nhà nước ở Việt Nam được tổ chức theo nguyên tắc nào?', ['Tam quyền phân lập hoàn toàn', 'Tập trung vào một cá nhân', 'Thống nhất, có phân công, phối hợp, kiểm soát'], 2],
@@ -64,7 +68,13 @@ const JUNCTIONS = [
   ['Thực hành dân chủ phải đi đôi với điều gì?', ['Pháp chế, kỷ cương, kỷ luật', 'Nới lỏng pháp luật', 'Tách khỏi sự lãnh đạo của Đảng'], 0]
 ];
 const LOCK = [3, 4, 3, 5];
-const PEN = { m1: 10, m2: 20, cw: 5, m3: 15, m4: 10, pic: 5, guess: 20, safe: 15, hint: 30, skip: 60 };
+const CIRCUIT_NODES = [
+  { id: 'people', source: 'Nhân dân', target: 'Chủ thể của quyền lực nhà nước' },
+  { id: 'party', source: 'Đảng Cộng sản Việt Nam', target: 'Lãnh đạo Nhà nước và xã hội' },
+  { id: 'state', source: 'Nhà nước', target: 'Quản lý xã hội bằng Hiến pháp và pháp luật' },
+  { id: 'powers', source: 'Lập pháp · Hành pháp · Tư pháp', target: 'Được phân công, phối hợp, kiểm soát trong quyền lực nhà nước thống nhất' }
+];
+const PEN = { m1: 10, m2: 20, cw: 5, m3: 15, m4: 10, circuit: 10, pic: 5, guess: 20, safe: 15, hint: 30, skip: 60 };
 const PICS = {
   p1: {
     n: 1, title: 'Tấm ảnh trong tủ kính', img: 'tongtuyencu.jpg', kw: 'TỔNG TUYỂN CỬ',
@@ -86,9 +96,10 @@ const PICS = {
 const NOTES = {
   m1: '1945: Cách mạng Tháng Tám thành công, ngày 2/9/1945 Chủ tịch Hồ Chí Minh đọc Tuyên ngôn độc lập, khai sinh nước Việt Nam Dân chủ Cộng hòa, nhà nước dân chủ nhân dân đầu tiên ở Đông Nam Á. Từ đây hình thành cơ chế vận hành: Đảng lãnh đạo, Nhà nước quản lý, Nhân dân làm chủ.',
   m2: 'Từ Cách mạng Tháng Tám 1945, qua Tổng tuyển cử và Hiến pháp 1946, đến Đổi mới và Hiến pháp 2013: nền dân chủ và nhà nước pháp quyền được xây dựng, hoàn thiện dần.',
-  cw: 'Từ khóa hàng dọc: DÂN CHỦ. Dân chủ XHCN: nhân dân là chủ, nhân dân làm chủ.',
+  cw: 'Từ khóa hàng dọc: NHÂN DÂN. Tất cả quyền lực nhà nước thuộc về Nhân dân.',
   m3: 'Quyền lực nhà nước là thống nhất, có phân công, phối hợp, kiểm soát, không theo mô hình tam quyền phân lập. Hiến pháp và pháp luật ràng buộc mọi cơ quan, tổ chức, cá nhân. Nhân dân giám sát Nhà nước. Dân chủ đi đôi với pháp chế, kỷ cương, kỷ luật.',
-  m4: 'Đủ 5 mảnh mã. Chạy ngay tới buồng lái!'
+  m4: 'Ổ khóa đã mở. Nối mạch quyền lực để cấp điện cho hộp phanh.',
+  circuit: 'Mạch quyền lực đã thông. Tất cả quyền lực nhà nước thuộc về Nhân dân; quyền lực thống nhất, có phân công, phối hợp và kiểm soát.'
 };
 const ROT = ['-6deg', '4deg', '-3deg', '7deg', '-4deg'];
 const ROMAN = ['I', 'II', 'III', 'IV'];
@@ -102,6 +113,7 @@ const fresh = () => ({
   screen: 'intro', total: 720, left: 720, running: false, paused: false, stage: 0,
   done: {}, hints: {}, errors: 0, m1: false, m1Easy: false, m2: [], cw: Array(CW.length).fill(false), cwSel: 0,
   m3: { index: 0, order: [], locked: [], busy: false, movingSlot: null }, m4: [0, 0, 0, 0], pic: { p1: { t: Array(9).fill('c'), sel: null, lock: false, wrong: Array.from({ length: 9 }, () => []) } },
+  circuit: { selected: null, connected: [], targetOrder: [], hintPair: null },
   code: '', muted: false, reward: null
 });
 let S = fresh();
@@ -184,7 +196,7 @@ function renderTrack() {
   $('#track').innerHTML = STAGES.map((stage, index) => {
     const got = !!S.done[stage.id] && stage.id !== 'safe';
     const now = S.screen === 'play' && S.stage === index;
-    const title = isPic(stage.id) ? 'Tấm ảnh' : stage.id === 'safe' ? 'Hộp phanh' : `Mật mã ${stage.label}`;
+    const title = isPic(stage.id) ? 'Tấm ảnh' : stage.id === 'safe' ? 'Hộp phanh' : stage.id === 'circuit' ? 'Nối mạch quyền lực' : `Mật mã ${stage.label}`;
     const marker = stage.label;
     return `<li class="${got ? 'got' : ''} ${now ? 'now' : ''} ${stage.id === 'safe' ? 'safe' : ''} ${isPic(stage.id) ? 'pic' : ''}" title="${title}">${marker}</li>`;
   }).join('');
@@ -224,7 +236,7 @@ function penalty(seconds, isHint = false) {
 /* ---------- từng chặng ---------- */
 const RENDER = {
   m1: renderM1, m2: renderM2, p1: () => renderPic('p1'),
-  cw: renderCW, m3: renderJunction, m4: renderM4, safe: renderSafe
+  cw: renderCW, m3: renderJunction, m4: renderM4, circuit: renderCircuit, safe: renderSafe
 };
 function enterStage(index) {
   S.stage = index;
@@ -242,12 +254,13 @@ function showReward(id) {
   if (S.screen !== 'play') return;
   S.reward = id;
   const stage = STAGES[sidx(id)], picture = PICS[id];
-  $('#rwTitle').textContent = picture ? 'Tấm ảnh đã giải' : `Mật mã ${stage.label} đã giải`;
-  $('#rwDigit').hidden = !!picture; $('#rwPic').hidden = !picture; $('#rwKw').hidden = !picture;
+  const hasDigit = stage.digit != null;
+  $('#rwTitle').textContent = picture ? 'Tấm ảnh đã giải' : id === 'circuit' ? 'Mạch quyền lực đã nối' : `Mật mã ${stage.label} đã giải`;
+  $('#rwDigit').hidden = !hasDigit; $('#rwPic').hidden = !picture; $('#rwKw').hidden = !picture;
   if (picture) {
     $('#rwPic').src = picture.img; $('#rwPic').alt = picture.title;
     $('#rwKw').textContent = picture.kw;
-  } else $('#rwDigit').textContent = stage.digit;
+  } else if (hasDigit) $('#rwDigit').textContent = stage.digit;
   $('#rwNote').textContent = picture ? picture.note : NOTES[id];
   $('#rwNext').textContent = STAGES[sidx(id) + 1].id === 'safe' ? 'Tới hộp phanh ▸' : 'Chặng tiếp theo ▸';
   $('#reward').hidden = false; sfx.stamp(); $('#rwNext').focus();
@@ -402,12 +415,12 @@ function answerPic(id, answer) {
 function renderCW() {
   const grid = $('#cw'); grid.style.setProperty('--cw-cols', CWCOLS);
   grid.innerHTML = CW.map(([, displayed, keyIndex], row) => {
-    const offset = KEYCOL - keyIndex, letters = [...displayed];
+    const offset = KEYCOL - keyIndex, letters = [...displayed], keyLetter = [...CW_KEY_DISPLAY][row];
     let cells = `<button type="button" class="cwn ${S.cwSel === row && !S.cw[row] ? 'sel' : ''}" data-r="${row}">${row + 1}</button>`;
     for (let column = 0; column < CWCOLS; column++) {
       const characterIndex = column - offset;
       cells += characterIndex >= 0 && characterIndex < letters.length
-        ? `<span class="box ${column === KEYCOL ? 'key' : ''} ${S.cw[row] ? 'on' : ''}">${S.cw[row] ? letters[characterIndex] : ''}</span>`
+        ? `<span class="box ${column === KEYCOL ? 'key' : ''} ${S.cw[row] ? 'on' : ''}">${S.cw[row] ? (column === KEYCOL ? keyLetter : letters[characterIndex]) : ''}</span>`
         : '<span></span>';
     }
     return cells;
@@ -429,13 +442,13 @@ $('#cwForm').addEventListener('submit', event => {
   const row = S.cwSel;
   if (value === CW_KEY) {
     S.cw = S.cw.map(() => true); $('#cwInput').value = ''; renderCW();
-    say('#cwMsg', 'Đoán trúng hàng dọc: DÂN CHỦ!'); solve('cw'); return;
+    say('#cwMsg', 'Đoán trúng hàng dọc: NHÂN DÂN!'); solve('cw'); return;
   }
   if (value === CW[row][0]) {
     S.cw[row] = true; $('#cwInput').value = ''; tone(700, .12, 'triangle', .2); tone(940, .2, 'triangle', .2, .1);
     const next = S.cw.findIndex(solved => !solved); if (next >= 0) S.cwSel = next;
     say('#cwMsg', `Đúng hàng ${row + 1}!`); renderCW();
-    if (next < 0) { say('#cwMsg', 'Hàng dọc: DÂN CHỦ!'); solve('cw'); }
+    if (next < 0) { say('#cwMsg', 'Hàng dọc: NHÂN DÂN!'); solve('cw'); }
   } else {
     shake($('#cwForm')); say('#cwMsg', `Sai rồi! Thử lại hàng ${row + 1}.`, true); penalty(PEN.cw); $('#cwInput').select();
   }
@@ -518,6 +531,62 @@ function renderM4() {
     <output>${value}</output><button type="button" data-d="${index}" data-s="-1" aria-label="Giảm vòng ${index + 1}">▼</button></div>`).join('');
   $('#lock').classList.toggle('open', !!S.done.m4);
 }
+
+function drawCircuitWires() {
+  const board = $('#circuitBoard'), svg = $('#circuitWires');
+  if (!board || !svg) return;
+  const boardRect = board.getBoundingClientRect();
+  svg.setAttribute('viewBox', `0 0 ${board.clientWidth} ${board.clientHeight}`);
+  svg.innerHTML = S.circuit.connected.map(id => {
+    const source = board.querySelector(`[data-wire-source="${id}"]`);
+    const target = board.querySelector(`[data-wire-target="${id}"]`);
+    if (!source || !target) return '';
+    const sourceRect = source.getBoundingClientRect(), targetRect = target.getBoundingClientRect();
+    const x1 = sourceRect.right - boardRect.left, y1 = sourceRect.top + sourceRect.height / 2 - boardRect.top;
+    const x2 = targetRect.left - boardRect.left, y2 = targetRect.top + targetRect.height / 2 - boardRect.top;
+    const curve = Math.max(24, (x2 - x1) * .45);
+    return `<path class="circuit-wire" d="M ${x1} ${y1} C ${x1 + curve} ${y1}, ${x2 - curve} ${y2}, ${x2} ${y2}"/>`;
+  }).join('');
+}
+function renderCircuit() {
+  const state = S.circuit;
+  if (!state.targetOrder.length) state.targetOrder = ['powers', 'state', 'party', 'people'];
+  const connected = new Set(state.connected);
+  $('#circuitProgress').textContent = `Đã nối ${connected.size} / ${CIRCUIT_NODES.length} đường`;
+  $('#circuitSources').innerHTML = CIRCUIT_NODES.map(node =>
+    `<button type="button" class="circuit-node ${state.selected === node.id ? 'selected' : ''} ${connected.has(node.id) ? 'connected' : ''} ${state.hintPair === node.id ? 'hinted' : ''}" data-wire-source="${node.id}" aria-pressed="${state.selected === node.id}" ${connected.has(node.id) ? 'disabled' : ''}>${node.source}</button>`
+  ).join('');
+  $('#circuitTargets').innerHTML = state.targetOrder.map(id => {
+    const node = CIRCUIT_NODES.find(item => item.id === id);
+    return `<button type="button" class="circuit-node ${connected.has(id) ? 'connected' : ''} ${state.hintPair === id ? 'hinted' : ''}" data-wire-target="${id}" ${connected.has(id) ? 'disabled' : ''}>${node.target}</button>`;
+  }).join('');
+  drawCircuitWires();
+}
+$('#circuitBoard').addEventListener('click', event => {
+  if (S.done.circuit || S.screen !== 'play' || S.paused) return;
+  const state = S.circuit, source = event.target.closest('[data-wire-source]'), target = event.target.closest('[data-wire-target]');
+  if (source) {
+    state.selected = state.selected === source.dataset.wireSource ? null : source.dataset.wireSource;
+    say('#circuitMsg', state.selected ? 'Đã chọn đầu mạch. Chọn mô tả phù hợp để nối.' : 'Đã bỏ chọn đầu mạch.');
+    renderCircuit(); return;
+  }
+  if (!target) return;
+  if (!state.selected) { say('#circuitMsg', 'Hãy chọn một đầu mạch bên trái trước.', true); return; }
+  if (state.selected === target.dataset.wireTarget) {
+    state.connected.push(state.selected); state.selected = null; state.hintPair = null;
+    renderCircuit(); say('#circuitMsg', 'Nối đúng! Mạch đã thông thêm một nhánh.');
+    tone(700, .12, 'triangle', .2); tone(940, .2, 'triangle', .2, .1);
+    if (state.connected.length === CIRCUIT_NODES.length) {
+      say('#circuitMsg', 'Toàn bộ mạch đã thông! Hộp phanh được cấp điện.');
+      solve('circuit');
+    }
+  } else {
+    say('#circuitMsg', 'Sai đường nối! Hãy thử ghép lại.', true); penalty(PEN.circuit);
+  }
+});
+window.addEventListener('resize', () => {
+  if (S.screen === 'play' && cur() === 'circuit') drawCircuitWires();
+});
 $('#dials').addEventListener('click', event => {
   const button = event.target.closest('button'); if (!button || S.done.m4) return;
   const index = Number(button.dataset.d);
@@ -575,7 +644,7 @@ function lose() {
 }
 function clearUI() {
   $('#brakeCabinet').classList.remove('engaged'); $('#lock').classList.remove('open');
-  ['#m1Msg', '#m2Msg', '#cwMsg', '#m3Msg', '#m4Msg', '#safeMsg'].forEach(selector => say(selector, ''));
+  ['#m1Msg', '#m2Msg', '#cwMsg', '#m3Msg', '#m4Msg', '#circuitMsg', '#safeMsg'].forEach(selector => say(selector, ''));
   ['#m1A', '#cwInput', '#p1Guess'].forEach(selector => {
     const element = $(selector); if (!element) return;
     element.value = ''; element.readOnly = false; element.classList.remove('ok');
@@ -621,6 +690,10 @@ function hint() {
     const availableWrong = state.order.filter(answer => answer !== correct && !state.locked.includes(answer));
     if (availableWrong.length) state.locked.push(availableWrong[Math.floor(Math.random() * availableWrong.length)]);
     renderJunction();
+  }
+  if (id === 'circuit') {
+    S.circuit.hintPair = H(id) === 1 ? 'people' : 'party';
+    renderCircuit();
   }
   if (isPic(id)) renderPic(id);
 }
