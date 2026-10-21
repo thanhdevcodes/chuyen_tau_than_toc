@@ -21,7 +21,7 @@ const HINTS = {
   p1: ['Đã lật chữ cái đầu của mỗi từ trong từ khóa.', 'Đã lật thêm một nửa số chữ cái.'],
   cw: ['Cột tô vàng là chủ thể nắm mọi quyền lực nhà nước.', 'Hàng 5 là bản tuyên ngôn năm 1945.'],
   m3: ['Đáp án đúng ở ngã ba 1 có hai từ: "thống nhất" và "kiểm soát".', 'Ở ngã ba 2, không ai đứng ngoài Hiến pháp và pháp luật.'],
-  m4: ['Vòng I: Đảng, Nhà nước, Nhân dân. Vòng II: đếm các vế bắt đầu bằng chữ "dân". Vòng III: lập pháp, hành pháp, tư pháp.', 'Vòng IV: đếm các tiêu chí trong mục tiêu dân giàu, nước mạnh, dân chủ, công bằng, văn minh.'],
+  m4: ['Các năm cần nhớ trải từ Tuyên ngôn độc lập và Tổng tuyển cử đầu tiên đến công cuộc Đổi mới và Hiến pháp hiện hành.', 'Câu đầu là năm nước Việt Nam Dân chủ Cộng hòa ra đời; câu cuối là năm Quốc hội thông qua Hiến pháp hiện hành.'],
   circuit: ['Mối nối đầu tiên: Nhân dân là chủ thể của quyền lực nhà nước.', 'Đảng Cộng sản Việt Nam lãnh đạo Nhà nước và xã hội.'],
   safe: ['Tháng viết bằng 1 chữ số, năm viết bằng 4 chữ số.', 'Mã bắt đầu bằng 1 và kết thúc bằng 6.']
 };
@@ -67,7 +67,12 @@ const JUNCTIONS = [
   ['Ai có quyền giám sát hoạt động của Nhà nước?', ['Chỉ chính các cơ quan nhà nước', 'Nhân dân, cùng sự phản biện xã hội của Mặt trận Tổ quốc Việt Nam', 'Chỉ các tổ chức nước ngoài'], 1],
   ['Thực hành dân chủ phải đi đôi với điều gì?', ['Pháp chế, kỷ cương, kỷ luật', 'Nới lỏng pháp luật', 'Tách khỏi sự lãnh đạo của Đảng'], 0]
 ];
-const LOCK = [3, 4, 3, 5];
+const YEAR_QUESTIONS = [
+  ['Tuyên ngôn Độc lập khai sinh nước Việt Nam Dân chủ Cộng hòa vào năm nào?', '1945'],
+  ['Cuộc Tổng tuyển cử đầu tiên bầu Quốc hội diễn ra vào năm nào?', '1946'],
+  ['Đại hội VI mở đầu công cuộc Đổi mới diễn ra vào năm nào?', '1986'],
+  ['Quốc hội thông qua Hiến pháp hiện hành vào năm nào?', '2013']
+];
 const CIRCUIT_NODES = [
   { id: 'people', source: 'Nhân dân', target: 'Chủ thể của quyền lực nhà nước' },
   { id: 'party', source: 'Đảng Cộng sản Việt Nam', target: 'Lãnh đạo Nhà nước và xã hội' },
@@ -98,11 +103,10 @@ const NOTES = {
   m2: 'Từ Cách mạng Tháng Tám 1945, qua Tổng tuyển cử và Hiến pháp 1946, đến Đổi mới và Hiến pháp 2013: nền dân chủ và nhà nước pháp quyền được xây dựng, hoàn thiện dần.',
   cw: 'Từ khóa hàng dọc: NHÂN DÂN. Tất cả quyền lực nhà nước thuộc về Nhân dân.',
   m3: 'Quyền lực nhà nước là thống nhất, có phân công, phối hợp, kiểm soát, không theo mô hình tam quyền phân lập. Hiến pháp và pháp luật ràng buộc mọi cơ quan, tổ chức, cá nhân. Nhân dân giám sát Nhà nước. Dân chủ đi đôi với pháp chế, kỷ cương, kỷ luật.',
-  m4: 'Ổ khóa đã mở. Nối mạch quyền lực để cấp điện cho hộp phanh.',
+  m4: 'Cửa buồng lái đã mở sau khi xác định đúng các mốc 1945, 1946, 1986 và 2013. Nối mạch quyền lực để cấp điện cho hộp phanh.',
   circuit: 'Mạch quyền lực đã thông. Tất cả quyền lực nhà nước thuộc về Nhân dân; quyền lực thống nhất, có phân công, phối hợp và kiểm soát.'
 };
 const ROT = ['-6deg', '4deg', '-3deg', '7deg', '-4deg'];
-const ROMAN = ['I', 'II', 'III', 'IV'];
 const sidx = id => STAGES.findIndex(stage => stage.id === id);
 const cur = () => STAGES[S.stage].id;
 const isPic = id => Object.hasOwn(PICS, id);
@@ -112,7 +116,7 @@ const norm = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').rep
 const fresh = () => ({
   screen: 'intro', total: 720, left: 720, running: false, paused: false, stage: 0,
   done: {}, hints: {}, errors: 0, m1: false, m1Easy: false, m2: [], cw: Array(CW.length).fill(false), cwSel: 0,
-  m3: { index: 0, order: [], locked: [], busy: false, movingSlot: null }, m4: [0, 0, 0, 0], pic: { p1: { t: Array(9).fill('c'), sel: null, lock: false, wrong: Array.from({ length: 9 }, () => []) } },
+  m3: { index: 0, order: [], locked: [], busy: false, movingSlot: null }, m4: { index: 0, code: '' }, pic: { p1: { t: Array(9).fill('c'), sel: null, lock: false, wrong: Array.from({ length: 9 }, () => []) } },
   circuit: { selected: null, connected: [], targetOrder: [], hintPair: null },
   code: '', muted: false, reward: null
 });
@@ -196,7 +200,7 @@ function renderTrack() {
   $('#track').innerHTML = STAGES.map((stage, index) => {
     const got = !!S.done[stage.id] && stage.id !== 'safe';
     const now = S.screen === 'play' && S.stage === index;
-    const title = isPic(stage.id) ? 'Tấm ảnh' : stage.id === 'safe' ? 'Hộp phanh' : stage.id === 'circuit' ? 'Nối mạch quyền lực' : `Mật mã ${stage.label}`;
+    const title = isPic(stage.id) ? 'Tấm ảnh' : stage.id === 'safe' ? 'Hộp phanh' : stage.id === 'circuit' ? 'Nối mạch quyền lực' : stage.id === 'm4' ? 'Bảng điều độ khẩn cấp' : `Mật mã ${stage.label}`;
     const marker = stage.label;
     return `<li class="${got ? 'got' : ''} ${now ? 'now' : ''} ${stage.id === 'safe' ? 'safe' : ''} ${isPic(stage.id) ? 'pic' : ''}" title="${title}">${marker}</li>`;
   }).join('');
@@ -255,7 +259,7 @@ function showReward(id) {
   S.reward = id;
   const stage = STAGES[sidx(id)], picture = PICS[id];
   const hasDigit = stage.digit != null;
-  $('#rwTitle').textContent = picture ? 'Tấm ảnh đã giải' : id === 'circuit' ? 'Mạch quyền lực đã nối' : `Mật mã ${stage.label} đã giải`;
+  $('#rwTitle').textContent = picture ? 'Tấm ảnh đã giải' : id === 'circuit' ? 'Mạch quyền lực đã nối' : id === 'm4' ? 'Bảng điều độ đã giải' : `Mật mã ${stage.label} đã giải`;
   $('#rwDigit').hidden = !hasDigit; $('#rwPic').hidden = !picture; $('#rwKw').hidden = !picture;
   if (picture) {
     $('#rwPic').src = picture.img; $('#rwPic').alt = picture.title;
@@ -526,10 +530,24 @@ function chooseJunctionBranch(slot) {
   }
 }
 function renderM4() {
-  $('#dials').innerHTML = S.m4.map((value, index) => `<div class="dial"><small>${ROMAN[index]}</small>
-    <button type="button" data-d="${index}" data-s="1" aria-label="Tăng vòng ${index + 1}">▲</button>
-    <output>${value}</output><button type="button" data-d="${index}" data-s="-1" aria-label="Giảm vòng ${index + 1}">▼</button></div>`).join('');
-  $('#lock').classList.toggle('open', !!S.done.m4);
+  const state = S.m4;
+  const question = YEAR_QUESTIONS[state.index];
+  $('#m4QuestionNo').textContent = state.index < YEAR_QUESTIONS.length
+    ? `CÂU ${state.index + 1} / ${YEAR_QUESTIONS.length}`
+    : 'ĐÃ MỞ CỬA';
+  $('#m4Question').textContent = question ? question[0] : 'Cửa buồng lái đã mở!';
+  $$('#m4Lcd span').forEach((element, index) => {
+    element.textContent = state.code[index] || '';
+  });
+  $$('#m4Lights .door-light').forEach((light, index) => {
+    light.classList.toggle('lit', index < state.index);
+  });
+  $('#m4DoorStatus').textContent = state.index === YEAR_QUESTIONS.length
+    ? 'CỬA BUỒNG LÁI ĐÃ MỞ'
+    : `ĐÈN ĐÃ SÁNG ${state.index} / ${YEAR_QUESTIONS.length}`;
+  $$('#m4Pad button').forEach(button => {
+    button.disabled = S.done.m4 || !question;
+  });
 }
 
 function drawCircuitWires() {
@@ -587,20 +605,51 @@ $('#circuitBoard').addEventListener('click', event => {
 window.addEventListener('resize', () => {
   if (S.screen === 'play' && cur() === 'circuit') drawCircuitWires();
 });
-$('#dials').addEventListener('click', event => {
-  const button = event.target.closest('button'); if (!button || S.done.m4) return;
-  const index = Number(button.dataset.d);
-  S.m4[index] = (S.m4[index] + Number(button.dataset.s) + 10) % 10;
-  tone(1200, .04, 'square', .05); renderM4();
-});
-$('#m4Try').addEventListener('click', () => {
-  if (S.done.m4) return;
-  if (S.m4.every((value, index) => value === LOCK[index])) {
-    $('#lock').classList.add('open'); sfx.clunk(); say('#m4Msg', 'Cạch! Ổ khóa đã bật.'); solve('m4');
-  } else {
-    shake($('#lock')); say('#m4Msg', 'Khóa không nhúc nhích. Có ít nhất một vòng sai.', true); penalty(PEN.m4);
+$('#m4Pad').innerHTML = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'Xóa', '0', 'Nhập'].map(key =>
+  `<button type="button" data-k="${key}" class="${key === 'Nhập' ? 'go' : ''}">${key}</button>`).join('');
+function m4Key(key) {
+  if (S.screen !== 'play' || cur() !== 'm4' || S.paused || S.done.m4) return;
+  if (key === 'Xóa') {
+    S.m4.code = S.m4.code.slice(0, -1);
+    renderM4(); return;
   }
+  if (key === 'Nhập') return tryM4();
+  if (/^[0-9]$/.test(key) && S.m4.code.length < 4) {
+    S.m4.code += key;
+    tone(900 + Number(key) * 40, .06, 'square', .06);
+    renderM4();
+  }
+}
+$('#m4Pad').addEventListener('click', event => {
+  const button = event.target.closest('button');
+  if (button) m4Key(button.dataset.k);
 });
+function tryM4() {
+  if (S.screen !== 'play' || cur() !== 'm4' || S.paused || S.done.m4) return;
+  if (S.m4.code.length !== 4) {
+    say('#m4Msg', 'Hãy nhập đủ 4 chữ số của năm.', true);
+    return;
+  }
+  if (S.m4.code === YEAR_QUESTIONS[S.m4.index][1]) {
+    S.m4.index++;
+    S.m4.code = '';
+    renderM4();
+    say('#m4Msg', S.m4.index === YEAR_QUESTIONS.length
+      ? 'Đủ bốn đèn! Cửa buồng lái đang mở.'
+      : 'Chính xác! Một đèn khóa đã sáng.');
+    tone(720, .12, 'triangle', .22); tone(1080, .2, 'triangle', .2, .1);
+    if (S.m4.index === YEAR_QUESTIONS.length) {
+      sfx.clunk();
+      solve('m4');
+    }
+  } else {
+    S.m4.code = '';
+    renderM4();
+    shake($('#m4Lcd'));
+    say('#m4Msg', 'Sai năm rồi! Mất 10 giây, hãy thử lại.', true);
+    penalty(PEN.m4);
+  }
+}
 
 /* ---------- két/phanh ---------- */
 function renderSafe() {
@@ -643,7 +692,7 @@ function lose() {
   S.running = false; S.left = 0; $('#reward').hidden = true; $('#pauseOv').hidden = true; sfx.alarm(); setScreen('lose');
 }
 function clearUI() {
-  $('#brakeCabinet').classList.remove('engaged'); $('#lock').classList.remove('open');
+  $('#brakeCabinet').classList.remove('engaged');
   ['#m1Msg', '#m2Msg', '#cwMsg', '#m3Msg', '#m4Msg', '#circuitMsg', '#safeMsg'].forEach(selector => say(selector, ''));
   ['#m1A', '#cwInput', '#p1Guess'].forEach(selector => {
     const element = $(selector); if (!element) return;
@@ -766,6 +815,11 @@ document.addEventListener('keydown', event => {
   }
   if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
   const key = event.key, id = cur();
+  if (S.screen === 'play' && id === 'm4') {
+    if (key === 'Enter') { event.preventDefault(); m4Key('Nhập'); return; }
+    if (/^[0-9]$/.test(key)) { m4Key(key); return; }
+    if (key === 'Backspace') { event.preventDefault(); m4Key('Xóa'); return; }
+  }
   if (key === 'Enter') {
     if (!$('#boardingWarning').hidden) return;
     if (S.screen === 'intro') { event.preventDefault(); start(); }

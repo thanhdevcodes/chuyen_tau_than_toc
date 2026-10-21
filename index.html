@@ -294,55 +294,40 @@ int main() {
           <div class="panel" data-stage="m4" hidden>
             <div class="head">
               <div>
-                <div class="eyebrow">Mật mã 5 / 5</div>
-                <h2 class="ptitle">Ổ khóa bốn vòng số</h2>
+                <div class="eyebrow">Kiểm soát buồng lái</div>
+                <h2 class="ptitle">Bảng điều độ khẩn cấp</h2>
                 <p class="task">
-                  Mỗi vòng số là đáp án của một câu hỏi. Chỉnh đủ bốn vòng rồi
-                  bấm <b>Thử mở khóa</b>. Khóa không cho biết vòng nào sai.
+                  Nhập năm của sự kiện lịch sử để bật từng đèn khóa cửa buồng lái.
+                  Trả lời sai bị trừ 10 giây; có thể nhập lại đến khi đủ bốn đèn.
                 </p>
               </div>
             </div>
             <div class="m4">
-              <div class="lock" id="lock">
-                <div class="shackle"></div>
-                <div class="lockbody" id="dials"></div>
-              </div>
-              <div class="side">
-                <ol class="qs">
-                  <li>
-                    <b>I</b
-                    ><span
-                      >Cơ chế vận hành của hệ thống chính trị Việt Nam gồm mấy
-                      chủ thể?</span
-                    >
-                  </li>
-                  <li>
-                    <b>II</b
-                    ><span
-                      >Phương châm "Dân biết, dân bàn, dân làm, dân kiểm tra"
-                      gồm mấy vế?</span
-                    >
-                  </li>
-                  <li>
-                    <b>III</b
-                    ><span
-                      >Quyền lực nhà nước thống nhất, có phân công, phối hợp,
-                      kiểm soát giữa mấy quyền?</span
-                    >
-                  </li>
-                  <li>
-                    <b>IV</b
-                    ><span
-                      >Mục tiêu "dân giàu, nước mạnh, dân chủ, công bằng, văn
-                      minh" gồm mấy tiêu chí?</span
-                    >
-                  </li>
-                </ol>
-                <div class="row">
-                  <button class="btn" id="m4Try" type="button">
-                    Thử mở khóa
-                  </button>
+              <section class="dispatch-panel" aria-label="Cửa buồng lái">
+                <div class="dispatch-label">CỬA BUỒNG LÁI · KHÓA TỪ</div>
+                <div class="cockpit-door">
+                  <div class="door-lights" id="m4Lights" aria-label="Đèn khóa cửa">
+                    <span class="door-light"><b>01</b></span>
+                    <span class="door-light"><b>02</b></span>
+                    <span class="door-light"><b>03</b></span>
+                    <span class="door-light"><b>04</b></span>
+                  </div>
+                  <div class="door-window"><span></span></div>
+                  <div class="door-handle"></div>
                 </div>
+                <div class="door-status" id="m4DoorStatus" aria-live="polite">
+                  CHỜ NHẬP MÃ NĂM
+                </div>
+              </section>
+              <div class="m4-console">
+                <div class="year-question">
+                  <div class="keyhead" id="m4QuestionNo">CÂU 1 / 4</div>
+                  <p id="m4Question"></p>
+                </div>
+                <div class="lcd m4-lcd" id="m4Lcd" aria-label="Năm đang nhập">
+                  <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="pad m4-pad" id="m4Pad" aria-label="Bàn phím nhập năm"></div>
                 <div class="msg" id="m4Msg" aria-live="polite"></div>
               </div>
             </div>
@@ -505,8 +490,8 @@ int main() {
                 phối hợp, kiểm soát trong quyền lực nhà nước thống nhất.
               </li>
               <li>
-                Ổ khóa: <b>3 – 4 – 3 – 5</b>. Mã phanh: <b>11946</b> (tháng
-                1/1946).
+                Bảng điều độ: <b>1945 – 1946 – 1986 – 2013</b>. Mã phanh:
+                <b>11946</b> (tháng 1/1946).
               </li>
             </ol>
           </article>
